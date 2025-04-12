@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import Music from './pages/Music';
 import ConcentrationMusic from './pages/ConcentrationMusic';
 import Motivation from './pages/Motivation';
+import Game from './pages/Game';
+import './App.css';
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
         <Route path="/music" element={<Music />} />
         <Route path="/concentration-music" element={<ConcentrationMusic />} />
         <Route path="/motivation" element={<Motivation />} />
+        <Route path="/game" element={<Game />} />
       </Routes>
     </Router>
   );

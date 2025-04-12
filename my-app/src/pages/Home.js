@@ -474,8 +474,7 @@ function Home() {
   };
 
   const handleGame = () => {
-    // Implement game functionality
-    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+    navigate('/game');
   };
 
   const copyTasksToNextDay = async () => {
