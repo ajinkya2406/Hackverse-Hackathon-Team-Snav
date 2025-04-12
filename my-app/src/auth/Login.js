@@ -61,6 +61,7 @@ function Login() {
       // Store token and user data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('isLoggedIn', 'true');
       
       // Set default auth header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

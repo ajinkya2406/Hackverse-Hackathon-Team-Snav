@@ -91,35 +91,53 @@ body {
 }
 
 .task-form-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
   margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .form-group {
   margin-bottom: 1.25rem;
 }
 
+.form-group > div {
+  color: #ffffff !important;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.task-form-container > div:not(.form-group) {
+  color: #ffffff !important;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
 .form-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  color: #ffffff;
   margin-bottom: 0.5rem;
   letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .form-input {
   width: 100%;
   padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(147, 51, 234, 0.25);
+  background: rgba(20, 16, 36, 0.4);
+  border: 1px solid rgba(147, 51, 234, 0.3);
   border-radius: 12px;
   font-size: 0.875rem;
   transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.95);
+  color: #ffffff !important;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -131,18 +149,18 @@ body {
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .form-input[type="time"] {
   width: 100%;
   padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(147, 51, 234, 0.25);
+  background: rgba(20, 16, 36, 0.4);
+  border: 1px solid rgba(147, 51, 234, 0.3);
   border-radius: 12px;
   font-size: 0.875rem;
   transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.95);
+  color: #ffffff !important;
   position: relative;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -702,6 +720,10 @@ body {
   margin-bottom: 2rem;
   text-align: center;
   letter-spacing: -0.01em;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .pie-chart-container {
@@ -786,6 +808,10 @@ body {
 .overall-progress {
   margin-top: 3rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .overall-progress h3 {
@@ -794,6 +820,7 @@ body {
   font-weight: 600;
   margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
+  text-align: center;
 }
 
 .progress-bar {
@@ -839,6 +866,7 @@ body {
   font-size: 1.1rem;
   font-weight: 500;
   margin-top: 1rem;
+  text-align: center;
 }
 
 @keyframes progressShimmer {
@@ -1479,4 +1507,234 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Motivational Quote Popup Styles */
+.quote-popup {
+  position: fixed;
+  top: 200px;
+  left: 350px;
+  transform: none;
+  z-index: 1000;
+  animation: fadeInScale 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards, floatPopup 6s ease-in-out infinite;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 350px;
+  max-width: 350px;
+}
+
+.quote-content {
+  position: relative;
+  background: linear-gradient(135deg, rgba(30, 25, 44, 0.85), rgba(60, 50, 80, 0.85));
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  animation: pulseBackground 8s infinite alternate;
+}
+
+@keyframes pulseBackground {
+  0%, 100% {
+    background: linear-gradient(135deg, rgba(30, 25, 44, 0.85), rgba(60, 50, 80, 0.85));
+  }
+  50% {
+    background: linear-gradient(135deg, rgba(40, 30, 60, 0.85), rgba(75, 60, 100, 0.85));
+  }
+}
+
+.quote-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
+  z-index: 0;
+  animation: rotateBg 15s linear infinite, pulseOpacity 6s ease-in-out infinite;
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+.quote-content::after {
+  content: '"';
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 120px;
+  line-height: 0;
+  color: rgba(255, 255, 255, 0.1);
+  font-family: Georgia, serif;
+  animation: floatQuote 4s ease-in-out infinite;
+}
+
+@keyframes floatQuote {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+  50% { transform: translateY(-5px) rotate(5deg); opacity: 0.2; }
+}
+
+.quote-text {
+  position: relative;
+  color: #ffffff;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  font-weight: 400;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 10px;
+  padding: 0 20px;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.6s ease forwards 0.3s, glow 3s infinite alternate;
+  opacity: 0;
+  transform: translateY(20px);
+  background: linear-gradient(90deg, #ffffff, #E9D5FF, #ffffff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(147, 51, 234, 0.3),
+                 0 0 15px rgba(147, 51, 234, 0.1);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.5),
+                 0 0 25px rgba(147, 51, 234, 0.2);
+  }
+}
+
+.quote-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.quote-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.quote-content .particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: floatParticle 6s infinite linear, shimmerParticle 3s infinite alternate;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(20px, -30px);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmerParticle {
+  from {
+    box-shadow: 0 0 4px 1px rgba(147, 51, 234, 0.2);
+    background: rgba(255, 255, 255, 0.5);
+  }
+  to {
+    box-shadow: 0 0 8px 2px rgba(147, 51, 234, 0.4);
+    background: rgba(255, 255, 255, 0.8);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatPopup {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Form heading style for white text */
+.form-heading {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Overall progress heading */
+.total-progress h3 {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Progress percentage text */
+.progress-text {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  display: block;
+  text-align: center;
 } 

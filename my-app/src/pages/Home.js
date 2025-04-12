@@ -40,6 +40,22 @@ api.interceptors.response.use(
   }
 );
 
+// Add motivational quotes array outside the component
+const motivationalQuotes = [
+  "The only way to do great work is to love what you do. - Steve Jobs",
+  "Believe you can and you're halfway there. - Theodore Roosevelt",
+  "It does not matter how slowly you go as long as you do not stop. - Confucius",
+  "Your time is limited, don't waste it living someone else's life. - Steve Jobs",
+  "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+  "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
+  "Believe in yourself. You are braver than you think, more talented than you know. - Roy T. Bennett",
+  "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+  "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+  "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
+  "You are never too old to set another goal or to dream a new dream. - C.S. Lewis",
+  "The secret of getting ahead is getting started. - Mark Twain"
+];
+
 function Home() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
@@ -63,6 +79,8 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [showQuote, setShowQuote] = useState(false);
+  const [todaysQuote, setTodaysQuote] = useState('');
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -76,6 +94,30 @@ function Home() {
     };
     fetchUserData();
   }, []);
+
+  // Modify the useEffect for daily quote to show the quote for 2 minutes
+  useEffect(() => {
+    // Check if user is logged in using the userData state instead of localStorage
+    if (userData) {
+      // Get today's date and use it as seed for consistent daily quote
+      const today = new Date().toDateString();
+      const dateHash = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const quoteIndex = dateHash % motivationalQuotes.length;
+      
+      // Set today's quote
+      setTodaysQuote(motivationalQuotes[quoteIndex]);
+      
+      // Show quote popup after a short delay
+      setTimeout(() => {
+        setShowQuote(true);
+      }, 1500);
+      
+      // Hide quote after 2 minutes (120000ms)
+      setTimeout(() => {
+        setShowQuote(false);
+      }, 120000);
+    }
+  }, [userData]); // Add userData as dependency
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -238,6 +280,7 @@ function Home() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('isLoggedIn');
     navigate('/login');
   };
 
@@ -327,7 +370,7 @@ function Home() {
         { text: "Work on a side project", icon: "💡" },
         { text: "Join an online study group", icon: "👥" },
         { text: "Create a study schedule", icon: "⏰" },
-        { text: "Practice presentation skills", icon: "🎤" },
+        { text: "Practice presentation skills", icon: "��" },
         { text: "Do a quick coding exercise", icon: "💻" },
         { text: "Write a blog post", icon: "✍️" },
         { text: "Learn a new skill online", icon: "🎓" }
@@ -507,6 +550,11 @@ function Home() {
     }, 30000);
   };
 
+  // Add function to close quote manually
+  const handleCloseQuote = () => {
+    setShowQuote(false);
+  };
+
   return (
     <div className="home-container">
       <nav className="navbar">
@@ -603,7 +651,7 @@ function Home() {
             <h2 className="task-form-title">Add New Task</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="form-group">
-                <label htmlFor="title" className="form-label">Title</label>
+                <div className="form-heading">Title</div>
                 <input
                   id="title"
                   name="title"
@@ -616,7 +664,7 @@ function Home() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="description" className="form-label">Description</label>
+                <div className="form-heading">Description</div>
                 <textarea
                   id="description"
                   name="description"
@@ -628,7 +676,7 @@ function Home() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="dueDate" className="form-label">Due Date</label>
+                <div className="form-heading">Due Date</div>
                 <input
                   id="dueDate"
                   name="dueDate"
@@ -640,7 +688,7 @@ function Home() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="dueTime" className="form-label">Due Time (24-hour format)</label>
+                <div className="form-heading">Due Time (24-hour format)</div>
                 <input
                   type="time"
                   name="dueTime"
@@ -868,6 +916,23 @@ function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Quote Popup */}
+      {showQuote && (
+        <div className="quote-popup">
+          <div className="quote-content">
+            <div className="quote-text">{todaysQuote}</div>
+            <button className="quote-close" onClick={handleCloseQuote}>×</button>
+            
+            {/* Add floating particles */}
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
           </div>
         </div>
       )}

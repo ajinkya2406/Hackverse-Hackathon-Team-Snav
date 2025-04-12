@@ -30,6 +30,10 @@ const Music = () => {
   const handleCardClick = (type) => {
     if (type === 'Concentration Music') {
       navigate('/concentration-music');
+    } else if (type === 'Memorizing Music') {
+      navigate('/memorizing-music');
+    } else if (type === 'Mind Fresh Music') {
+      navigate('/mind-fresh-music');
     } else {
       // Handle other music types
       window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(type), '_blank');

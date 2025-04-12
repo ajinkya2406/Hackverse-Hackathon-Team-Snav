@@ -32,6 +32,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   overflow: hidden;
+  animation: cardFloat 6s ease-in-out infinite;
 }
 
 .concentration-music-card::before {
@@ -51,6 +52,23 @@
   border-color: rgba(147, 51, 234, 0.3);
 }
 
+.concentration-music-card:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.concentration-music-card:nth-child(2) {
+  animation-delay: 2s;
+}
+
+.concentration-music-card:nth-child(3) {
+  animation-delay: 4s;
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
 .music-player {
   margin-bottom: 1.5rem;
   min-height: 100px;
@@ -60,6 +78,30 @@
   background: rgba(50, 43, 68, 0.7);
   border-radius: 12px;
   padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.music-player::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(33, 150, 243, 0.1), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+  opacity: 0;
+}
+
+.music-player:has(.playing)::before {
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .play-button {
@@ -76,6 +118,21 @@
   font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.play-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.5s ease;
 }
 
 .play-button:hover {
@@ -84,9 +141,42 @@
   box-shadow: 0 8px 25px rgba(33, 150, 243, 0.6);
 }
 
+.play-button:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.play-button svg {
+  animation: iconPulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 .play-button.playing {
   background: linear-gradient(135deg, #43A047 0%, #2E7D32 100%);
   box-shadow: 0 4px 15px rgba(67, 160, 71, 0.4);
+  animation: playingPulse 2s infinite;
+}
+
+@keyframes playingPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(67, 160, 71, 0.4); }
+  50% { box-shadow: 0 4px 25px rgba(67, 160, 71, 0.8); }
+}
+
+.play-button.playing svg {
+  animation: spinPulse 3s linear infinite;
+}
+
+@keyframes spinPulse {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(0deg); }
+  50% { transform: scale(1) rotate(180deg); }
+  75% { transform: scale(1.1) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
 }
 
 .concentration-music-card h2 {
