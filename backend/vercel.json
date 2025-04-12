@@ -13,8 +13,8 @@
     }
   ],
   "env": {
+    "NODE_ENV": "production",
     "MONGO_URI": "@mongo_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "NODE_ENV": "production"
+    "JWT_SECRET": "@jwt_secret"
   }
 } 
