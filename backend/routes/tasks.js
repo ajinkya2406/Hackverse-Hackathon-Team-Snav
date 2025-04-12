@@ -7,6 +7,9 @@ const taskController = require('../controllers/taskController');
 // All routes are protected and require authentication
 router.use(auth);
 
+// Search tasks
+router.get('/search', taskController.searchTasks);
+
 // Get all tasks
 router.get('/', async (req, res) => {
   try {

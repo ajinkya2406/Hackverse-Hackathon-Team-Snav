@@ -56,4 +56,5 @@ app.listen(PORT, () => {
   console.log('  POST /api/tasks');
   console.log('  PATCH /api/tasks/:taskId/status');
   console.log('  DELETE /api/tasks/:taskId');
+  console.log('  GET  /api/tasks/search');
 });

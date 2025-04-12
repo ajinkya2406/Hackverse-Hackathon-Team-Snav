@@ -171,4 +171,27 @@ exports.getTaskHistory = async (req, res) => {
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
+};
+
+// Search tasks
+exports.searchTasks = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    const tasks = await Task.find({
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ],
+      user: req.user.id
+    }).sort({ dueDateTime: 1 });
+
+    res.json(tasks);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Failed to search tasks' });
+  }
 }; 

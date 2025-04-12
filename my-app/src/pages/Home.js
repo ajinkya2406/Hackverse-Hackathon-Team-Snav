@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { format, addMinutes, isSameDay } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { PieChart } from 'react-minimal-pie-chart';
 import './Home.css';
@@ -59,6 +59,10 @@ function Home() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -382,15 +386,7 @@ function Home() {
     }
   };
 
-  const handleViewHistory = async (taskId) => {
-    try {
-      const response = await api.get(`/tasks/${taskId}/history`);
-      setTaskHistory(response.data);
-      setShowHistoryModal(true);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch task history');
-    }
-  };
+
 
   const calculateTotalProgress = () => {
     if (tasks.length === 0) return 0;
@@ -399,15 +395,25 @@ function Home() {
   };
 
   const getProgressData = () => {
-    const statusCounts = tasks.reduce((acc, task) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dailyTasks = tasks.filter(task => {
+      const taskDate = new Date(task.dueDateTime);
+      return taskDate >= today && taskDate < tomorrow;
+    });
+
+    const statusCounts = dailyTasks.reduce((acc, task) => {
       acc[task.status] = (acc[task.status] || 0) + 1;
       return acc;
     }, {});
 
-    const totalTasks = tasks.length;
+    const totalTasks = dailyTasks.length;
     if (totalTasks === 0) {
       return [
-        { title: 'No Tasks', value: 100, color: '#E0E0E0' }
+        { title: 'No Tasks Today', value: 100, color: '#E0E0E0' }
       ];
     }
 
@@ -445,19 +451,122 @@ function Home() {
     setSelectedDate(e.target.value);
   };
 
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      try {
+        const response = await api.get(`/tasks/search?q=${encodeURIComponent(query)}`);
+        setSearchResults(response.data);
+        setShowSearchResults(true);
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to search tasks');
+      }
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleMusic = () => {
+    // Implement music functionality
+    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  };
+
+  const handleMotivation = () => {
+    // Implement motivation functionality
+    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  };
+
+  const handleGame = () => {
+    // Implement game functionality
+    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  };
+
   return (
     <div className="home-container">
-      <div className="max-w-3xl mx-auto w-full">
-        <div className="task-manager-header">
-          <h1 className="task-manager-title">Task Manager</h1>
-          <button
-            onClick={handleLogout}
-            className="logout-button"
-          >
+      <nav className="navbar">
+        <div className="nav-left">
+          <div className="profile-container">
+            <button 
+              className="profile-btn"
+              onClick={() => setShowProfile(!showProfile)}
+            >
+              {userData?.profileImage ? (
+                <img 
+                  src={userData.profileImage} 
+                  alt="Profile" 
+                  className="profile-image"
+                />
+              ) : (
+                <div className="profile-icon">
+                  {userData?.username ? userData.username.charAt(0).toUpperCase() : 'U'}
+                </div>
+              )}
+              <span className="profile-name">{userData?.username}</span>
+            </button>
+            {showProfile && (
+              <div className="profile-dropdown">
+                <div className="profile-info">
+                  <h3>Profile Details</h3>
+                  <p><strong>Username:</strong> {userData?.username}</p>
+                  <p><strong>Email:</strong> {userData?.email}</p>
+                  <p><strong>Age:</strong> {userData?.age}</p>
+                  <p><strong>Education:</strong> {userData?.educationStatus}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="nav-center">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="search-input"
+            />
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="search-results">
+                {searchResults.map(task => (
+                  <div 
+                    key={task._id} 
+                    className="search-result-item"
+                    onClick={() => {
+                      setSelectedDate(format(new Date(task.dueDateTime), 'yyyy-MM-dd'));
+                      setShowSearchResults(false);
+                    }}
+                  >
+                    <h4>{task.title}</h4>
+                    <p>{format(new Date(task.dueDateTime), 'MMM dd, yyyy HH:mm')}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="nav-right">
+          <button className="nav-btn" onClick={handleMusic}>
+            <span className="nav-icon">🎵</span>
+            <span className="nav-text">Music</span>
+          </button>
+          <button className="nav-btn" onClick={handleMotivation}>
+            <span className="nav-icon">💪</span>
+            <span className="nav-text">Motivation</span>
+          </button>
+          <button className="nav-btn" onClick={handleGame}>
+            <span className="nav-icon">🎮</span>
+            <span className="nav-text">Game</span>
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
+      </nav>
 
+      <div className="max-w-3xl mx-auto w-full">
         {error && (
           <div className="error-message">
             <p>{error}</p>
