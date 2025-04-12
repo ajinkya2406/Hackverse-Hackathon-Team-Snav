@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Task = require('../models/Task');
+const taskController = require('../controllers/taskController');
 
 // All routes are protected and require authentication
 router.use(auth);
@@ -130,6 +131,70 @@ router.delete('/:id', async (req, res) => {
     res.json(task);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Update task progress
+router.patch('/:id/progress', async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ error: 'Task ID is required' });
+    }
+
+    if (typeof req.body.progress !== 'number' || req.body.progress < 0 || req.body.progress > 100) {
+      return res.status(400).json({ error: 'Progress must be a number between 0 and 100' });
+    }
+
+    const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Add current state to history before updating
+    task.history.push({
+      status: task.status,
+      progress: task.progress,
+      notes: req.body.notes || 'Progress update'
+    });
+
+    // Update progress
+    task.progress = req.body.progress;
+    
+    // Update status if provided
+    if (req.body.status) {
+      const validStatuses = ['pending', 'in-progress', 'completed'];
+      if (!validStatuses.includes(req.body.status)) {
+        return res.status(400).json({ error: 'Invalid status value' });
+      }
+      task.status = req.body.status;
+    }
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (err) {
+    console.error('Error updating task progress:', err);
+    res.status(500).json({ error: 'Failed to update task progress' });
+  }
+});
+
+// Get task history
+router.get('/:id/history', async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ error: 'Task ID is required' });
+    }
+
+    const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Sort history by timestamp in descending order (newest first)
+    const history = task.history.sort((a, b) => b.timestamp - a.timestamp);
+    res.json(history);
+  } catch (err) {
+    console.error('Error fetching task history:', err);
+    res.status(500).json({ error: 'Failed to fetch task history' });
   }
 });
 

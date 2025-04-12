@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { format } from 'date-fns';
+import { format, addMinutes, isSameDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { PieChart } from 'react-minimal-pie-chart';
 import './Home.css';
 
 // Axios instance with proper auth configuration
@@ -53,6 +54,11 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [showBreakSuggestions, setShowBreakSuggestions] = useState(false);
   const [suggestedBreaks, setSuggestedBreaks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [taskHistory, setTaskHistory] = useState([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -144,19 +150,13 @@ function Home() {
 
     const now = new Date();
     const due = new Date(dueDate);
-    
-    // Convert to Indian timezone (IST)
-    const indianNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    const indianDue = new Date(due.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    
-    const diffInMinutes = Math.floor((indianDue - indianNow) / (1000 * 60));
+    const diffInMinutes = Math.floor((due - now) / (1000 * 60));
     const hoursRemaining = Math.floor(diffInMinutes / 60);
     const minutesRemaining = diffInMinutes % 60;
-    
+
     if (diffInMinutes < 0) return { text: 'Overdue', class: 'urgent' };
     if (hoursRemaining < 1) return { text: `${minutesRemaining} minutes remaining`, class: 'urgent' };
-    if (hoursRemaining < 24) return { text: `${hoursRemaining} hours ${minutesRemaining} minutes remaining`, class: 'urgent' };
-    if (hoursRemaining < 48) return { text: `${Math.floor(hoursRemaining/24)} days remaining`, class: 'warning' };
+    if (hoursRemaining < 24) return { text: `${hoursRemaining} hours ${minutesRemaining} minutes remaining`, class: 'warning' };
     return { text: `${Math.floor(hoursRemaining/24)} days remaining`, class: 'safe' };
   };
 
@@ -174,7 +174,7 @@ function Home() {
         setError('Invalid status value');
         return;
       }
-
+      
       if (newStatus === 'in-progress') {
         // Get the current due date and time
         const currentDueDate = new Date(task.dueDateTime || task.dueDate);
@@ -183,8 +183,8 @@ function Home() {
           return;
         }
         
-        // Add 1 hour while preserving the exact time format
-        const newDueDate = new Date(currentDueDate.getTime() + 60 * 60 * 1000);
+        // Add 20 minutes while preserving the exact time format
+        const newDueDate = new Date(currentDueDate.getTime() + 20 * 60 * 1000);
         const formattedDate = newDueDate.toISOString().split('.')[0] + '.000Z'; // Ensure consistent format with seconds
         
         const response = await api.patch(`/tasks/${taskId}`, { 
@@ -370,8 +370,83 @@ function Home() {
     setShowBreakSuggestions(true);
   };
 
+  const handleProgressUpdate = async (taskId, progress, notes = '') => {
+    try {
+      await api.patch(`/tasks/${taskId}/progress`, {
+        progress,
+        notes
+      });
+      fetchTasks(); // Refresh tasks list
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to update progress');
+    }
+  };
+
+  const handleViewHistory = async (taskId) => {
+    try {
+      const response = await api.get(`/tasks/${taskId}/history`);
+      setTaskHistory(response.data);
+      setShowHistoryModal(true);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to fetch task history');
+    }
+  };
+
+  const calculateTotalProgress = () => {
+    if (tasks.length === 0) return 0;
+    const totalProgress = tasks.reduce((sum, task) => sum + (task.progress || 0), 0);
+    return Math.round(totalProgress / tasks.length);
+  };
+
+  const getProgressData = () => {
+    const statusCounts = tasks.reduce((acc, task) => {
+      acc[task.status] = (acc[task.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const totalTasks = tasks.length;
+    if (totalTasks === 0) {
+      return [
+        { title: 'No Tasks', value: 100, color: '#E0E0E0' }
+      ];
+    }
+
+    return [
+      {
+        title: 'Completed',
+        value: (statusCounts['completed'] || 0) / totalTasks * 100,
+        color: '#4CAF50' // Green for completed
+      },
+      {
+        title: 'In Progress',
+        value: (statusCounts['in-progress'] || 0) / totalTasks * 100,
+        color: '#2196F3' // Blue for in progress
+      },
+      {
+        title: 'Pending',
+        value: (statusCounts['pending'] || 0) / totalTasks * 100,
+        color: '#F44336' // Red for pending
+      }
+    ];
+  };
+
+  const handleTaskSelect = (task) => {
+    setSelectedTask(task);
+  };
+
+  const getTasksByDate = (date) => {
+    return tasks.filter(task => {
+      const taskDate = new Date(task.dueDateTime);
+      return isSameDay(taskDate, new Date(date));
+    });
+  };
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
+
   return (
-    <div className="task-manager-container">
+    <div className="home-container">
       <div className="max-w-3xl mx-auto w-full">
         <div className="task-manager-header">
           <h1 className="task-manager-title">Task Manager</h1>
@@ -431,15 +506,14 @@ function Home() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="dueTime" className="form-label">Due Time</label>
+                <label htmlFor="dueTime" className="form-label">Due Time (24-hour format)</label>
                 <input
-                  id="dueTime"
-                  name="dueTime"
                   type="time"
+                  name="dueTime"
                   value={newTask.dueTime}
                   onChange={handleInputChange}
                   className="form-input"
-                  required
+                  step="300"
                 />
               </div>
               <button
@@ -474,52 +548,134 @@ function Home() {
             )}
           </div>
 
-          <div className="task-list-container">
-            <h2 className="task-list-title">Your Tasks</h2>
+          <div className="progress-section">
+            <h2>Task Status Distribution</h2>
+            <div className="pie-chart-container">
+              <PieChart
+                data={getProgressData()}
+                lineWidth={20}
+                paddingAngle={5}
+                rounded
+                label={({ dataEntry }) => dataEntry.value > 0 ? `${Math.round(dataEntry.value)}%` : ''}
+                labelStyle={{
+                  fontSize: '12px',
+                  fontFamily: 'sans-serif',
+                  fill: '#333'
+                }}
+                labelPosition={0}
+                style={{ height: '200px', width: '200px' }}
+              />
+              <div className="progress-legend">
+                <div className="legend-item">
+                  <span className="legend-color" style={{ backgroundColor: '#4CAF50' }}></span>
+                  <span>Completed</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-color" style={{ backgroundColor: '#2196F3' }}></span>
+                  <span>In Progress</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-color" style={{ backgroundColor: '#F44336' }}></span>
+                  <span>Pending</span>
+                </div>
+              </div>
+            </div>
+            <div className="total-progress">
+              <h3>Overall Progress</h3>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill"
+                  style={{ width: `${calculateTotalProgress()}%` }}
+                ></div>
+              </div>
+              <span className="progress-text">{calculateTotalProgress()}%</span>
+            </div>
+          </div>
+
+          <div className="tasks-container">
+            <div className="tasks-header">
+              <h2 className="task-list-title">Your Tasks</h2>
+              <div className="date-filter">
+                <button 
+                  className="filter-btn"
+                  onClick={() => setShowDateFilter(!showDateFilter)}
+                >
+                  {showDateFilter ? 'Hide Date Filter' : 'Show Date Filter'}
+                </button>
+                {showDateFilter && (
+                  <div className="date-picker">
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                      className="date-input"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="space-y-4">
               {loading ? (
                 <div className="loading-state">Loading tasks...</div>
-              ) : tasks.length === 0 ? (
-                <div className="empty-state">No tasks yet. Add your first task!</div>
+              ) : getTasksByDate(selectedDate).length === 0 ? (
+                <div className="empty-state">No tasks for this date. Add a new task!</div>
               ) : (
-                tasks.map(task => (
+                getTasksByDate(selectedDate).map(task => (
                   <div 
                     key={task._id} 
-                    className="task-card"
-                    data-status={task.status}
+                    className={`task-card ${task.status} ${selectedTask?._id === task._id ? 'selected' : ''}`}
+                    onClick={() => handleTaskSelect(task)}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="task-title">{task.title}</h3>
-                        <p className="task-description">{task.description}</p>
-                        <p className="task-due-date">
-                          Due: {format(new Date(task.dueDateTime || task.dueDate), 'MMM dd, yyyy HH:mm')}
-                        </p>
-                        <span className={`task-time-remaining ${calculateTimeRemaining(task.dueDateTime || task.dueDate, task.status).class}`}>
-                          {calculateTimeRemaining(task.dueDateTime || task.dueDate, task.status).text}
-                        </span>
-                      </div>
+                    <div className="task-header">
+                      <h3>{task.title}</h3>
                       <div className="task-actions">
-                        <select
-                          value={task.status}
-                          onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                          className="status-select"
+                        <button 
+                          className="delete-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(task._id);
+                          }}
                         >
-                          <option value="pending">Pending</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                        </select>
-                        <button
-                          onClick={() => handleDelete(task._id)}
-                          className="delete-task-button"
-                          title="Delete Task"
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
                           Delete
                         </button>
                       </div>
+                    </div>
+                    
+                    <p className="task-description">{task.description}</p>
+                    
+                    <div className="task-footer">
+                      <div className="task-info">
+                        <span className="due-date">
+                          Due: {format(new Date(task.dueDateTime), 'MMM dd, yyyy HH:mm')}
+                        </span>
+                        <span className={`time-remaining ${calculateTimeRemaining(task.dueDateTime, task.status).class}`}>
+                          {calculateTimeRemaining(task.dueDateTime, task.status).text}
+                        </span>
+                      </div>
+                      <div className="task-progress">
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={task.progress || 0}
+                          onChange={(e) => handleProgressUpdate(task._id, parseInt(e.target.value))}
+                          onClick={(e) => e.stopPropagation()}
+                          className="progress-slider"
+                        />
+                        <span className="progress-value">{task.progress || 0}%</span>
+                      </div>
+                      <select
+                        value={task.status}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(task._id, e.target.value);
+                        }}
+                        className="status-select"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                      </select>
                     </div>
                   </div>
                 ))
@@ -528,6 +684,41 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {/* History Modal */}
+      {showHistoryModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Task History</h3>
+              <button 
+                className="close-btn"
+                onClick={() => setShowHistoryModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="history-list">
+              {taskHistory.map((entry, index) => (
+                <div key={index} className="history-entry">
+                  <div className="history-timestamp">
+                    {format(new Date(entry.timestamp), 'MMM dd, yyyy HH:mm')}
+                  </div>
+                  <div className="history-details">
+                    <span className="history-status" data-status={entry.status}>
+                      {entry.status}
+                    </span>
+                    <span className="history-progress">{entry.progress}%</span>
+                    {entry.notes && (
+                      <p className="history-notes">{entry.notes}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
