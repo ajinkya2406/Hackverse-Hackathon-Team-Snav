@@ -22,7 +22,7 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
+      await axios.post('https://focusmate-backend.vercel.app/api/auth/register', form);
       alert('Registered successfully!');
       navigate('/login');
     } catch (err) {

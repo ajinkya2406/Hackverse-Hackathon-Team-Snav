@@ -6,7 +6,7 @@ import './Auth.css';
 
 // Create axios instance with proper configuration
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://focusmate-backend.vercel.app/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
