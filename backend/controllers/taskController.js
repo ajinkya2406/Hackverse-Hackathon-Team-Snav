@@ -194,4 +194,46 @@ exports.searchTasks = async (req, res) => {
     console.error('Search error:', error);
     res.status(500).json({ error: 'Failed to search tasks' });
   }
+};
+
+// Copy tasks to next day
+exports.copyTasksToNextDay = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Find all tasks for today
+    const todayTasks = await Task.find({
+      user: req.user.id,
+      dueDateTime: {
+        $gte: today,
+        $lt: tomorrow
+      }
+    });
+
+    // Create new tasks for tomorrow
+    const newTasks = todayTasks.map(task => {
+      const newDueDateTime = new Date(task.dueDateTime);
+      newDueDateTime.setDate(newDueDateTime.getDate() + 1);
+      
+      return {
+        title: task.title,
+        description: task.description,
+        dueDateTime: newDueDateTime,
+        status: 'pending', // Reset status to pending
+        progress: 0, // Reset progress to 0
+        user: req.user.id
+      };
+    });
+
+    // Insert new tasks
+    await Task.insertMany(newTasks);
+
+    res.json({ message: 'Tasks copied successfully', count: newTasks.length });
+  } catch (error) {
+    console.error('Error copying tasks:', error);
+    res.status(500).json({ error: 'Failed to copy tasks' });
+  }
 }; 

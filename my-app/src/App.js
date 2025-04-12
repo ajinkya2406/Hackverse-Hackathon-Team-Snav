@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Register from './auth/Register';
 import Login from './auth/Login';
 import Home from './pages/Home';
+import Music from './pages/Music';
+import ConcentrationMusic from './pages/ConcentrationMusic';
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/music" element={<Music />} />
+        <Route path="/concentration-music" element={<ConcentrationMusic />} />
       </Routes>
     </Router>
   );

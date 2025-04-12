@@ -10,6 +10,9 @@ router.use(auth);
 // Search tasks
 router.get('/search', taskController.searchTasks);
 
+// Copy tasks to next day
+router.post('/copy-to-next-day', taskController.copyTasksToNextDay);
+
 // Get all tasks
 router.get('/', async (req, res) => {
   try {

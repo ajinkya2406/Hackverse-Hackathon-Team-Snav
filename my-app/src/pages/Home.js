@@ -386,8 +386,6 @@ function Home() {
     }
   };
 
-
-
   const calculateTotalProgress = () => {
     if (tasks.length === 0) return 0;
     const totalProgress = tasks.reduce((sum, task) => sum + (task.progress || 0), 0);
@@ -467,9 +465,8 @@ function Home() {
     }
   };
 
-  const handleMusic = () => {
-    // Implement music functionality
-    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  const handleMusicClick = () => {
+    navigate('/music');
   };
 
   const handleMotivation = () => {
@@ -480,6 +477,36 @@ function Home() {
   const handleGame = () => {
     // Implement game functionality
     window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  };
+
+  const copyTasksToNextDay = async () => {
+    try {
+      const response = await api.post('/tasks/copy-to-next-day');
+      if (response.data) {
+        fetchTasks(); // Refresh tasks list
+        setError(''); // Clear any previous errors
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to copy tasks');
+    }
+  };
+
+  const handleTaskMusic = (e) => {
+    e.stopPropagation();
+    const musicFiles = [
+      '/focus-music-1.mp3.mp3',
+      '/focus-music-2.mp3.mp3',
+      '/focus-music-3.mp3.mp3'
+    ];
+    const randomMusic = musicFiles[Math.floor(Math.random() * musicFiles.length)];
+    const audio = new Audio(randomMusic);
+    audio.play();
+    
+    // Stop the music after 30 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    }, 30000);
   };
 
   return (
@@ -548,7 +575,7 @@ function Home() {
         </div>
 
         <div className="nav-right">
-          <button className="nav-btn" onClick={handleMusic}>
+          <button className="nav-btn" onClick={handleMusicClick}>
             <span className="nav-icon">🎵</span>
             <span className="nav-text">Music</span>
           </button>
@@ -633,7 +660,7 @@ function Home() {
                 {loading ? 'Adding Task...' : 'Add Task'}
               </button>
             </form>
-            {!loading && (
+            <div className="action-buttons">
               <button
                 onClick={generateBreakSuggestions}
                 className="generate-breaks-button"
@@ -643,7 +670,16 @@ function Home() {
                 </svg>
                 Generate Break Suggestions
               </button>
-            )}
+              <button
+                onClick={copyTasksToNextDay}
+                className="copy-tasks-button"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                </svg>
+                Copy Today's Tasks to Tomorrow
+              </button>
+            </div>
             {showBreakSuggestions && (
               <div className="break-suggestions">
                 <h3 className="break-suggestions-title">Suggested Breaks</h3>
@@ -738,6 +774,15 @@ function Home() {
                     <div className="task-header">
                       <h3>{task.title}</h3>
                       <div className="task-actions">
+                        <button 
+                          className="music-btn"
+                          onClick={handleTaskMusic}
+                        >
+                          <img src="/audio.png" alt="Play Music" className="music-icon" />
+                        </button>
+                        <div className="action-separator">
+                          <i className="fas fa-circle"></i>
+                        </div>
                         <button 
                           className="delete-btn"
                           onClick={(e) => {
