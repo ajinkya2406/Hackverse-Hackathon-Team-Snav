@@ -1,11 +1,12 @@
 // App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Register from './auth/Register';
 import Login from './auth/Login';
 import Home from './pages/Home';
 import Music from './pages/Music';
 import ConcentrationMusic from './pages/ConcentrationMusic';
+import Motivation from './pages/Motivation';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/music" element={<Music />} />
         <Route path="/concentration-music" element={<ConcentrationMusic />} />
+        <Route path="/motivation" element={<Motivation />} />
       </Routes>
     </Router>
   );

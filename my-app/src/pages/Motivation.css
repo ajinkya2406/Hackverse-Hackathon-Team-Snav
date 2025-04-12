@@ -1,0 +1,39 @@
+.motivation-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.motivation-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.audio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.audio-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.audio-card:hover {
+  transform: translateY(-5px);
+}
+
+.audio-card h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.audio-card audio {
+  width: 100%;
+  margin-top: 1rem;
+} 
