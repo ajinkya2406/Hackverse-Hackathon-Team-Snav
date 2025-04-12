@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { PieChart } from 'react-minimal-pie-chart';
 import './Home.css';
 
-// Axios instance with proper auth configuration
+// Axios instance with proper auth configuration a
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
   headers: {
