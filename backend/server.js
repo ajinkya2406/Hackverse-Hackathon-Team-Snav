@@ -10,9 +10,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://focusmate-frontend.vercel.app', /\.vercel\.app$/] 
-    : 'http://localhost:3000',
+  origin: 'http://localhost:3000', // React app's origin
   credentials: true
 }));
 app.use(express.json());

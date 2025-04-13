@@ -22,24 +22,15 @@
       "dest": "/static/$1"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/book.png",
-      "dest": "/book.png"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
+      "src": "/(.*\\.(js|jpg|jpeg|png|gif|ico|css|svg))",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "PORT": "3000"
+  }
 } 

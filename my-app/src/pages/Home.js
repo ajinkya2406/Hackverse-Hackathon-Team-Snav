@@ -7,7 +7,7 @@ import './Home.css';
 
 // Axios instance with proper auth configuration a
 const api = axios.create({
-  baseURL: 'https://focusmate-backend.vercel.app/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com',
   headers: {
     'Content-Type': 'application/json'
   }
