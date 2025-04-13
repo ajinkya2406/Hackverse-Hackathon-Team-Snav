@@ -14,7 +14,11 @@
     { "source": "/favicon.ico", "destination": "/favicon.ico" },
     { "source": "/manifest.json", "destination": "/manifest.json" },
     { "source": "/asset-manifest.json", "destination": "/asset-manifest.json" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" },
+    {
+      "source": "/api/:path*",
+      "destination": "https://hackverse-hackathon-team-snav.onrender.com/api/:path*"
+    }
   ],
   "headers": [
     {
