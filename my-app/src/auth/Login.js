@@ -11,8 +11,20 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: true
+  withCredentials: false // Change this to false for Vercel deployment
 });
+
+// Add response interceptor to handle CORS errors
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', error);
+    if (error.message.includes('Network Error')) {
+      return Promise.reject(new Error('Unable to connect to server. Please try again later.'));
+    }
+    return Promise.reject(error);
+  }
+);
 
 function Login() {
   const navigate = useNavigate();

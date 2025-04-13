@@ -9,9 +9,10 @@ import './Home.css';
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL?.trim() || 'https://hackverse-hackathon-team-snav.onrender.com/api',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
-  withCredentials: true
+  withCredentials: false
 });
 
 // Add request interceptor to add auth token
@@ -32,10 +33,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error);
     if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
+    } else if (error.message.includes('Network Error')) {
+      return Promise.reject(new Error('Unable to connect to server. Please try again later.'));
     }
     return Promise.reject(error);
   }
