@@ -6,7 +6,7 @@ import './Auth.css';
 
 // Create axios instance with proper configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com',
+  baseURL: process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

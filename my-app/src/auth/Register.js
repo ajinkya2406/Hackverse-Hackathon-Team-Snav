@@ -22,7 +22,7 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com';
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com/api';
       await axios.post(`${apiUrl}/auth/register`, form);
       alert('Registered successfully!');
       navigate('/login');
