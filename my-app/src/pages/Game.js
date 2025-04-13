@@ -139,6 +139,11 @@ const Game = () => {
         num2 = Math.floor(Math.random() * 12) + 1;
         answer = num1 * num2;
         break;
+      default:
+        num1 = Math.floor(Math.random() * 50) + 1;
+        num2 = Math.floor(Math.random() * 50) + 1;
+        answer = num1 + num2;
+        break;
     }
     
     return {
@@ -159,6 +164,9 @@ const Game = () => {
         break;
       case 3:
         setGameState(initializeQuickMath());
+        break;
+      default:
+        setGameState({});
         break;
     }
   };
@@ -231,18 +239,21 @@ const Game = () => {
   };
 
   useEffect(() => {
-    if (selectedGame === 3) {
+    if (selectedGame === 3 && gameState.timeLeft !== undefined) {
       const timer = setInterval(() => {
-        if (gameState.timeLeft > 0) {
-          setGameState({...gameState, timeLeft: gameState.timeLeft - 1});
-        } else {
+        setGameState(prevState => ({
+          ...prevState,
+          timeLeft: prevState.timeLeft > 0 ? prevState.timeLeft - 1 : 0
+        }));
+        
+        if (gameState.timeLeft <= 0) {
           setFeedback('Time\'s up! Try again.');
           setGameState(initializeQuickMath());
         }
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [gameState.timeLeft, selectedGame]);
+  }, [selectedGame, gameState.timeLeft]);
 
   return (
     <div className="game-container">

@@ -72,7 +72,7 @@ function Home() {
   const [showBreakSuggestions, setShowBreakSuggestions] = useState(false);
   const [suggestedBreaks, setSuggestedBreaks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [taskHistory, setTaskHistory] = useState([]);
+  const [taskHistory] = useState([]);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [showDateFilter, setShowDateFilter] = useState(false);
