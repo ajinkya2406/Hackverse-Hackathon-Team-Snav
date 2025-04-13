@@ -11,19 +11,20 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://focusmate-backend.vercel.app/api/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
     },
     {
-      "src": "/(.*\\.(js|jpg|jpeg|png|gif|ico|css|svg))",
-      "dest": "/$1"
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/book.png",
+      "dest": "/book.png"
     },
     {
       "src": "/(.*)",
