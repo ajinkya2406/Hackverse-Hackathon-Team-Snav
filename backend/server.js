@@ -10,10 +10,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://voluble-muffin-fe5a35.netlify.app', 'http://localhost:3000'],
+  origin: ['https://hackverse-hackathon-team-snav-24f6.vercel.app', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 
