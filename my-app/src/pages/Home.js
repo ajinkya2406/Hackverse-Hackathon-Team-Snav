@@ -7,7 +7,7 @@ import './Home.css';
 
 // Axios instance with proper auth configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL?.trim() || 'https://hackverse-hackathon-team-snav.onrender.com/api',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -15,7 +15,7 @@ const api = axios.create({
   withCredentials: false
 });
 
-// Add request interceptor to add auth token
+// Add request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -29,7 +29,7 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle auth errors
+// Add response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -38,7 +38,8 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
-    } else if (error.message.includes('Network Error')) {
+    } else if (error.message.includes('Network Error') || !error.response) {
+      console.error('Network or CORS error detected');
       return Promise.reject(new Error('Unable to connect to server. Please try again later.'));
     }
     return Promise.reject(error);

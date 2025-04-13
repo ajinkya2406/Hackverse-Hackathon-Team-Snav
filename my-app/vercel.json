@@ -1,46 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
   "rewrites": [
-    { "source": "/static/(.*)", "destination": "/static/$1" },
-    { "source": "/favicon.ico", "destination": "/favicon.ico" },
-    { "source": "/manifest.json", "destination": "/manifest.json" },
-    { "source": "/asset-manifest.json", "destination": "/asset-manifest.json" },
-    { "source": "/(.*)", "destination": "/index.html" },
-    {
-      "source": "/api/:path*",
-      "destination": "https://hackverse-hackathon-team-snav.onrender.com/api/:path*"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
-        },
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        }
-      ]
-    }
+    { 
+      "source": "/api/:path*", 
+      "destination": "https://hackverse-hackathon-team-snav.onrender.com/api/:path*" 
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 } 
