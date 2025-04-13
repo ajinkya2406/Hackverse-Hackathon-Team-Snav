@@ -6,7 +6,7 @@ import './Auth.css';
 
 // Create axios instance with proper configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com/api',
+  baseURL: process.env.REACT_APP_API_URL?.trim() || 'https://hackverse-hackathon-team-snav.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -34,7 +34,8 @@ function Login() {
         }
       })
       .then(() => navigate('/'))
-      .catch(() => {
+      .catch((err) => {
+        console.error('Token verification error:', err);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       });
@@ -51,7 +52,12 @@ function Login() {
     setLoading(true);
 
     try {
+      // Log the request URL for debugging
+      console.log('Making login request to:', `${api.defaults.baseURL}/auth/login`);
+      
       const response = await api.post('/auth/login', formData);
+      console.log('Login response:', response.data);
+      
       const { token, user } = response.data;
       
       if (!token || !user) {
@@ -71,11 +77,17 @@ function Login() {
     } catch (err) {
       console.error('Login error:', err);
       if (err.response) {
-        setError(err.response.data?.error || 'Login failed. Please try again.');
+        // Server responded with an error
+        console.error('Server error response:', err.response);
+        setError(err.response.data?.error || `Login failed (${err.response.status}). Please try again.`);
       } else if (err.request) {
-        setError('No response from server. Please try again later.');
+        // Request was made but no response received
+        console.error('No response received:', err.request);
+        setError('No response from server. Please check your internet connection and try again.');
       } else {
-        setError('An error occurred. Please try again.');
+        // Error in request setup
+        console.error('Request setup error:', err.message);
+        setError(`An error occurred: ${err.message}`);
       }
     } finally {
       setLoading(false);

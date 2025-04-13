@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { PieChart } from 'react-minimal-pie-chart';
 import './Home.css';
 
-// Axios instance with proper auth configuration a
+// Axios instance with proper auth configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://hackverse-hackathon-team-snav.onrender.com/api',
+  baseURL: process.env.REACT_APP_API_URL?.trim() || 'https://hackverse-hackathon-team-snav.onrender.com/api',
   headers: {
     'Content-Type': 'application/json'
   },
